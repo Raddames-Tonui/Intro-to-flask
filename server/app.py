@@ -16,11 +16,6 @@ db.init_app(app)
 @app.route("/v1/students", methods=["GET"])
 def fetch_students():
     students = Student.query.all()
-    # student_list = []
-    # for student in students:
-    #     student_list.append({"id": student.id, "name": student.name, "age": student.age, "email": student.email})
-    # print(students)
-
     student_list = [student.to_dict() for student in students]
     return jsonify(student_list), 200
 

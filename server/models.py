@@ -11,9 +11,15 @@ class Student(db.Model, SerializerMixin):
     email= db.Column(db.String(50), nullable=False)
 
     courses = db.relationship('Course', backref='student', lazy=True)
-
-    # def to_dict():
-    #     pass
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'age': self.age,
+            'email': self.email,
+            'courses': [course.to_dict() for course in self.courses]
+        }
+  
 
 
 class Course(db.Model, SerializerMixin):
@@ -24,9 +30,13 @@ class Course(db.Model, SerializerMixin):
 
     student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
 
-# Course
-# sandie #2121 jkdhfvksbj 1
-# mike #2121 jkdhfvksbj 1# class Enrollment(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
-#     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'code': self.code,
+            'description': self.description
+        }
+
+
+
