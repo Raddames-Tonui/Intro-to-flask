@@ -6,8 +6,12 @@ name = "pypi"
 [packages]
 flask = "*"
 sqlalchemy-serializer = "*"
+flask-migrate = "*"
+faker = "*"
+flask-bcrypt = "*"
+flask-jwt-extended = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "*"
+python_version = "3.8"
