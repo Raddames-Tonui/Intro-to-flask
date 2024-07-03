@@ -1,10 +1,14 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import AddBlog from './pages/AddEvent'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
+import { UserContext } from './context/UserContext';
 
-export default function Layout() {
+export default function Layout() 
+{
+  const {currentUser} = useContext(UserContext)
+  console.log(currentUser);
   return (
     <div>
         <nav class="bg-white mt-6 border-gray-200 dark:bg-gray-900">
@@ -24,16 +28,27 @@ export default function Layout() {
           <Link to="/" class="block py-2 px-3 text-lg text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500" aria-current="page">
             Home</Link>
         </li>
-        <li>
-          <Link to="/event/register" class="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
-            Event Registration</Link>
-        </li>
-        <li>
-          <Link to="/addevent" class="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
-            Add Event
-          </Link>
-        </li>
 
+        { currentUser && currentUser.email?
+        <>
+          <li>
+            <Link to="/event/register" class="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+              Event Registration</Link>
+          </li>
+          <li>
+            <Link to="/addevent" class="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+              Add Event
+            </Link>
+          </li>
+
+          <li>
+            <Link to="/profile" class="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+              Profile
+            </Link>
+          </li>
+        </>
+        :
+        <>
         <li>
           <Link to="/register" class="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
             Register
@@ -45,6 +60,8 @@ export default function Layout() {
             Login
           </Link>
         </li>
+        </>
+      }
 
       </ul>
     </div>

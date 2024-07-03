@@ -13,6 +13,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import { UserProvider } from './context/UserContext';
 import { EventProvider } from './context/EventContext';
+import Profile from './pages/Profile';
+import Dashboard from './pages/Dashboard';
 
 function App() {
 
@@ -24,6 +26,8 @@ function App() {
       <Routes>
         <Route path='/' element={<Layout/>}>
           <Route path='/' element={<Home />} />
+          <Route path='/dashboard' element={<Dashboard />} />
+
           <Route path='/event/register' element={<EventRegistration />} />
           <Route path='/addevent' element={<AddEvent />} />
           <Route path='/event/:id' element={<Event />} />
@@ -31,6 +35,8 @@ function App() {
 
           <Route path='/register' element={<Register />} />
           <Route path='/login' element={<Login />} />
+          <Route path='/profile' element={<Profile />} />
+
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>

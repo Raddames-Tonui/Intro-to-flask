@@ -1,4 +1,4 @@
-import { createContext, useState } from "react"
+import { createContext, useEffect, useState } from "react"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
 
@@ -8,7 +8,13 @@ export const UserProvider = ({ children }) =>
 {
     const nav = useNavigate()
 
-    const [currentUser, setCurrentUser] = useState("Kelvin")
+    const [currentUser, setCurrentUser] = useState()
+    
+    const [auth_token, setAuth_token] = useState( ()=> localStorage.getItem("access_token")? localStorage.getItem("access_token"): null )
+
+
+
+    console.log("Authentication Token ", auth_token)
 
     // All your functions and state variables will be available to all the children components that are wrapped in the UserProvider
    //    REGISTER USER
@@ -28,7 +34,6 @@ export const UserProvider = ({ children }) =>
           })
         .then((response) => response.json())
         .then((res) =>{
-        //   nav("/")
          if(res.success)
             {
                 toast.success(res.success)
@@ -46,21 +51,100 @@ export const UserProvider = ({ children }) =>
     
     }
 
+       //    Login USER
+       const login_user = (email, password) =>{
+        fetch('http://localhost:5000/login', {
+            method: 'POST',
+            body: JSON.stringify({
+                email: email,
+                password: password,
+            }),
+            headers: {
+              'Content-type': 'application/json',
+            },
+          })
+        .then((response) => response.json())
+        .then((res) =>{
+            // console.log(res)
+         if(res.access_token)
+            {
+                setAuth_token(res.access_token)
+                localStorage.setItem("access_token", res.access_token)
 
-      // useEffect(()=>{
-  //   fetch("http://localhost:3000/posts")
-  //   .then((res)=>res.json())
-  //   .then((data)=>{
-  //      setPosts(data)
-  //   })
+                toast.success("Logged in Successfully!")
+                nav("/dashboard")
+            }
+            else if(res.error)
+            {
+                toast.error(res.error)
+            }
+            else {
+                toast.error("An error occured")
+            }
+
+        });
+    
+    }
 
 
-  // },[])
+       //    Update USER
+       const update_user = (name, phone_number,is_organizer, password) =>{
+        fetch('http://localhost:5000/users', {
+            method: 'PUT',
+            body: JSON.stringify({
+                name: name,
+                password: password,
+                phone_number: phone_number,
+                is_organizer: is_organizer
+            }),
+            headers: {
+              'Content-type': 'application/json',
+              'Authorization': `Bearer ${auth_token}`
+            },
+          })
+        .then((response) => response.json())
+        .then((res) =>{
+         if(res.success)
+            {
+                toast.success(res.success)
+            }
+            else if(res.error)
+            {
+                toast.error(res.error)
+            }
+            else {
+                toast.error("An error occured")
+            }
+
+        });
+    
+    }
+
+    useEffect(()=>{
+        if(auth_token){
+                fetch("http://localhost:5000/current_user", {
+                    headers: {
+                    'Content-type': 'application/json',
+                    'Authorization': `Bearer ${auth_token}`
+                    } })
+                .then((res)=>res.json())
+                .then((data)=>{
+
+                    if(data.email){
+                        setCurrentUser(data)
+                    }
+                
+                })
+            }
+
+  },[auth_token])
 
     const contextData ={
         currentUser,
         setCurrentUser,
-        register_user
+        register_user,
+        login_user,
+        update_user
 
     }
     return (

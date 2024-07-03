@@ -144,12 +144,12 @@ def update_profile():
 
     user.name = data.get('name', user.name)
     user.email = user.email
-    user.password = data.get('password', user.password)
+    user.password = bcrypt.generate_password_hash( data['password'] ).decode('utf-8') 
     user.phone_number = data.get('phone_number', user.phone_number)
     user.is_admin = data.get('is_admin', user.is_admin)
     user.is_organizer = data.get('is_organizer', user.is_organizer)
     db.session.commit()
-    return jsonify({"message": "User updated successfully"}), 200
+    return jsonify({"success": "User updated successfully"}), 200
 
 @app.route('/users/<int:id>', methods=['DELETE'])
 def delete_user(id):
