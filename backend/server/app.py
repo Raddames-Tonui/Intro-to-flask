@@ -6,14 +6,16 @@ from flask import Flask, request, jsonify
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from datetime import timedelta
-
+from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 bcrypt = Bcrypt()
 
 
+
+
 app  = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///event.db" # postgres
-
+CORS(app)
 app.config["SECRET_KEY"] = "jdhfvksdjkgh"+ str(random.randint(1, 1000000))
 app.config["JWT_SECRET_KEY"] = "evrfsejhfgvret"+ str(random.randint(1, 1000000))
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)
@@ -62,23 +64,30 @@ def current_user():
     return jsonify(user_data), 200
 
 
-
+# Use registration
 @app.route('/users', methods=['POST'])
 def create_user():
     data = request.get_json()
+
+    email_exists = User.query.filter_by(email=data['email']).first()
+    if email_exists:
+        return jsonify({"error": "Email already exists"}), 400
+        
+    
     new_user = User(
         name=data['name'],
         email=data['email'],
         password= bcrypt.generate_password_hash( data['password'] ).decode('utf-8') ,
         phone_number=data.get('phone_number'),
         is_admin=data.get('is_admin', False),
-        is_organizer=data.get('is_organizer', False)
+        is_organizer=True if data['is_organizer']=="true" else False
+        # data.get('is_organizer', False)
     )
     db.session.add(new_user)
     db.session.commit()
-    return jsonify({"message": "User created successfully"}), 201
+    return jsonify({"success": "User created successfully"}), 201
 
-# Fetching user requires an user who is an admin
+# Fetching users requires an user who is an admin
 @app.route('/users', methods=['GET'])
 @jwt_required()
 def get_users():
@@ -115,16 +124,26 @@ def get_user(id):
         "is_organizer": user.is_organizer
     }), 200
 
-@app.route('/users/<int:id>', methods=['PUT'])
+
+
+#Update Profile should be done the the loggedin user only
+@app.route('/users', methods=['PUT'])
 @jwt_required()
-def update_user(id):
+def update_profile():
     data = request.get_json()
-    user = User.query.get(id)
+
+    loggedin_user_id = get_jwt_identity()
+    user = User.query.get(loggedin_user_id)
     if user is None:
         return jsonify({"message": "User not found"}), 404
+    
+
+    # email_exists = User.query.filter_by(email=data['email']).first()
+    # if email_exists:
+    #     return jsonify({"error": "Email already exists"}), 400
 
     user.name = data.get('name', user.name)
-    user.email = data.get('email', user.email)
+    user.email = user.email
     user.password = data.get('password', user.password)
     user.phone_number = data.get('phone_number', user.phone_number)
     user.is_admin = data.get('is_admin', user.is_admin)
@@ -141,6 +160,8 @@ def delete_user(id):
     db.session.delete(user)
     db.session.commit()
     return jsonify({"message": "User deleted successfully"}), 200
+
+
 
 # CRUD for Event
 @app.route('/events', methods=['POST'])
