@@ -9,12 +9,10 @@ export const UserProvider = ({ children }) =>
     const nav = useNavigate()
 
     const [currentUser, setCurrentUser] = useState()
-    
+    const [onChange, setOnChange ] = useState(false)
     const [auth_token, setAuth_token] = useState( ()=> localStorage.getItem("access_token")? localStorage.getItem("access_token"): null )
 
 
-
-    console.log("Authentication Token ", auth_token)
 
     // All your functions and state variables will be available to all the children components that are wrapped in the UserProvider
    //    REGISTER USER
@@ -120,6 +118,37 @@ export const UserProvider = ({ children }) =>
     
     }
 
+    // Logout
+    const logout = () =>{
+        fetch('http://localhost:5000/logout', {
+            method: 'DELETE',
+            headers: {
+              'Content-type': 'application/json',
+              'Authorization': `Bearer ${auth_token}`
+            },
+          })
+        .then((response) => response.json())
+        .then((res) =>{
+         if(res.success)
+            {
+                localStorage.removeItem("access_token")
+                setCurrentUser(null)
+                setAuth_token(null)
+                setOnChange(!onChange)
+                toast.success(res.success)
+            }
+            else if(res.error)
+            {
+                toast.error(res.error)
+            }
+            else {
+                toast.error("An error occured")
+            }
+
+        });
+
+    }
+
     useEffect(()=>{
         if(auth_token){
                 fetch("http://localhost:5000/current_user", {
@@ -133,18 +162,26 @@ export const UserProvider = ({ children }) =>
                     if(data.email){
                         setCurrentUser(data)
                     }
+                    else{
+                        localStorage.removeItem("access_token")
+                        setCurrentUser(null)
+                        setAuth_token(null)
+                        nav("/login")
+                    }
                 
                 })
             }
 
-  },[auth_token])
+  },[auth_token, onChange])
 
     const contextData ={
+        auth_token, 
         currentUser,
         setCurrentUser,
         register_user,
         login_user,
-        update_user
+        update_user,
+        logout
 
     }
     return (

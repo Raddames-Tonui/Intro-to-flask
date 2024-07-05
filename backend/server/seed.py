@@ -1,6 +1,6 @@
 from faker import Faker
 from models import db, User, Event, Registration
-from app import app
+from app import app, bcrypt
 
 
 faker = Faker()
@@ -12,7 +12,7 @@ def seed_data():
         db.drop_all()
         db.create_all()
    
-        password = 'securepassword123'
+        password =  bcrypt.generate_password_hash('kkkk').decode('utf-8')
 
         # Users table
         users = [

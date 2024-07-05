@@ -2,9 +2,10 @@
 
 # Flask
 import random
+import datetime
 from flask import Flask, request, jsonify
 from flask_migrate import Migrate
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_jwt
 from datetime import timedelta
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
@@ -62,6 +63,20 @@ def current_user():
         "is_organizer": user.is_organizer
     }
     return jsonify(user_data), 200
+
+# Logout
+BLACKLIST = set()
+@jwt.token_in_blocklist_loader
+def check_if_token_in_blocklist(jwt_header, decrypted_token):
+    return decrypted_token['jti'] in BLACKLIST
+
+@app.route("/logout", methods=["DELETE"])
+@jwt_required()
+def logout():
+    jti = get_jwt()["jti"]
+    BLACKLIST.add(jti)
+    return jsonify({"success":"Successfully logged out"}), 200
+
 
 
 # Use registration
@@ -165,20 +180,32 @@ def delete_user(id):
 
 # CRUD for Event
 @app.route('/events', methods=['POST'])
+@jwt_required()
 def create_event():
-    data = request.get_json()
-    new_event = Event(
-        event_name=data['event_name'],
-        description=data['description'],
-        event_date=datetime.strptime(data['event_date'], '%Y-%m-%d %H:%M:%S'),
-        location=data['location'],
-        organizer_id=data['organizer_id']
-    )
-    db.session.add(new_event)
-    db.session.commit()
-    return jsonify({"message": "Event created successfully"}), 201
+    current_user_id = get_jwt_identity()
 
+    current_user = User.query.get(current_user_id)
+
+    if current_user.is_organizer:
+        data = request.get_json()
+        new_event = Event(
+            event_name=data['event_name'],
+            description=data['description'],
+            event_date=data['event_date'],
+            location=data['location'],
+            organizer_id=current_user_id
+        )
+        db.session.add(new_event)
+        db.session.commit()
+        return jsonify({"success": "Event created successfully"}), 201
+
+    else:
+        return jsonify({"error": "You are not authorized to create events"}), 401
+
+
+# FETCH ALL EVENTS
 @app.route('/events', methods=['GET'])
+@jwt_required()
 def get_events():
     events = Event.query.all()
     event_list = [{
@@ -232,15 +259,24 @@ def delete_event(id):
 
 # CRUD for Registration
 @app.route('/registrations', methods=['POST'])
+@jwt_required()
 def create_registration():
     data = request.get_json()
+
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+
+    if current_user.is_organizer or current_user.is_admin:
+        return jsonify({"error": "Organizers/Admins cannot register for events"}), 400
+
     new_registration = Registration(
         event_id=data['event_id'],
-        user_id=data['user_id']
+        user_id=current_user_id
     )
+
     db.session.add(new_registration)
     db.session.commit()
-    return jsonify({"message": "Registration created successfully"}), 201
+    return jsonify({"success": "Registration created successfully"}), 201
 
 @app.route('/registrations', methods=['GET'])
 def get_registrations():

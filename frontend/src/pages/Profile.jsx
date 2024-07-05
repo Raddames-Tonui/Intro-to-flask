@@ -1,8 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { UserContext } from '../context/UserContext'
+import { useNavigate } from 'react-router-dom'
 
 function Profile() 
 {
+    const nav = useNavigate()
     const {currentUser, update_user} = useContext(UserContext)
     const [password, setPassword] = useState()
     const [repeatPassword, setRepeatPassword] = useState()
@@ -37,9 +39,11 @@ function Profile()
       setPhone_number("")
       is_organizer("false")
     }
+
+    if(!currentUser) return nav("/login")
   return (
-    <div class="flex flex-col justify-center items-center h-[100vh]">
-    <div class="relative flex flex-col items-center rounded-[20px] w-[400px] mx-auto p-4 bg-white bg-clip-border shadow-3xl shadow-shadow-500 dark:!bg-navy-800 dark:text-white dark:!shadow-none">
+    <div class="flex flex-col justify-center items-center min-h-[100vh]">
+    <div class="relative flex flex-col items-center rounded-[20px] w-[50vw] mx-auto p-4 bg-white bg-clip-border shadow-3xl shadow-shadow-500 dark:!bg-navy-800 dark:text-white dark:!shadow-none">
         <div class="relative flex h-32 w-full justify-center rounded-xl bg-cover" >
             <img src='https://horizon-tailwind-react-git-tailwind-components-horizon-ui.vercel.app/static/media/banner.ef572d78f29b0fee0a09.png' class="absolute flex h-32 w-full justify-center rounded-xl bg-cover" /> 
             <div class="absolute -bottom-12 flex h-[87px] w-[87px] items-center justify-center rounded-full border-[4px] border-white bg-green-400 dark:!border-navy-700">
@@ -71,9 +75,9 @@ function Profile()
         </div>
 
 
-        <div className=' border rounded-xl bg-gray-200'>
-            <h4 className='font-bold tex-2xl text-center'>Update Your Account</h4>
-            <form onSubmit={handleSubmit}>
+        <div className='w-[50vw] border rounded-xl bg-gray-200'>
+            <h4 className='font-bold tex-2xl text-center mt-8'>Update Your Account</h4>
+            <form onSubmit={handleSubmit} className='p-16'>
    
             <div className="mb-5">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>

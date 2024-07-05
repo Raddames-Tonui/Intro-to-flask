@@ -25,7 +25,7 @@ class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     event_name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
-    event_date = db.Column(db.DateTime, nullable=False)
+    event_date = db.Column(db.String, nullable=False)
     location = db.Column(db.String(100), nullable=False)
     organizer_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
