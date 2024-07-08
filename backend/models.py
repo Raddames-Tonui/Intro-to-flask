@@ -36,7 +36,7 @@ class Registration(db.Model):
     registration_id = db.Column(db.Integer, primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    registration_date = db.Column(db.DateTime, default=datetime.utcnow)
+    registration_date = db.Column(db.String)
 
 # A user has many events
 # An event belongs to an organizer 

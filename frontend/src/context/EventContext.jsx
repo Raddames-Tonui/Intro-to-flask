@@ -1,12 +1,14 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import { UserContext } from "./UserContext"
 import { toast } from 'react-toastify'
+import { useNavigate } from "react-router-dom"
 
 
 export const EventContext = createContext()
 
 export const EventProvider = ({ children }) => 
 {
+   const nav = useNavigate()
    const {auth_token} = useContext(UserContext)
 
    const [events, setEvents] = useState([])
@@ -34,6 +36,7 @@ export const EventProvider = ({ children }) =>
          if(res.success)
             {
                 toast.success(res.success)
+                nav("/dashboard")
             }
             else if(res.error)
             {

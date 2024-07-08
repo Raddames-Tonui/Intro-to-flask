@@ -84,15 +84,17 @@ def logout():
 def create_user():
     data = request.get_json()
 
-    email_exists = User.query.filter_by(email=data['email']).first()
+    email = request.json.get("email", None)
+    email_exists = User.query.filter_by(email=email).first()
     if email_exists:
         return jsonify({"error": "Email already exists"}), 400
         
     
     new_user = User(
-        name=data['name'],
-        email=data['email'],
-        password= bcrypt.generate_password_hash( data['password'] ).decode('utf-8') ,
+        name= request.json.get("name", None), 
+        email= request.json.get("email", None),
+        password= bcrypt.generate_password_hash( request.json.get("password", None) ).decode('utf-8') ,
+
         phone_number=data.get('phone_number'),
         is_admin=data.get('is_admin', False),
         is_organizer=True if data['is_organizer']=="true" else False
@@ -212,7 +214,7 @@ def get_events():
         "id": event.id,
         "event_name": event.event_name,
         "description": event.description,
-        "event_date": event.event_date.strftime('%Y-%m-%d %H:%M:%S'),
+        "event_date": event.event_date,
         "location": event.location,
         "organizer_id": event.organizer_id
     } for event in events]
@@ -227,7 +229,7 @@ def get_event(id):
         "id": event.id,
         "event_name": event.event_name,
         "description": event.description,
-        "event_date": event.event_date.strftime('%Y-%m-%d %H:%M:%S'),
+        "event_date": event.event_date,
         "location": event.location,
         "organizer_id": event.organizer_id
     }), 200
