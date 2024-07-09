@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
+import {server_url} from "../../config"
 
 export const UserContext = createContext()
 
@@ -17,7 +18,7 @@ export const UserProvider = ({ children }) =>
     // All your functions and state variables will be available to all the children components that are wrapped in the UserProvider
    //    REGISTER USER
     const register_user = (name,email, phone_number,is_organizer, password) =>{
-        fetch('http://localhost:5000/users', {
+        fetch(`${server_url}/users`, {
             method: 'POST',
             body: JSON.stringify({
                 name: name,
@@ -51,7 +52,7 @@ export const UserProvider = ({ children }) =>
 
        //    Login USER
        const login_user = (email, password) =>{
-        fetch('http://localhost:5000/login', {
+        fetch(`${server_url}/login`, {
             method: 'POST',
             body: JSON.stringify({
                 email: email,
@@ -87,7 +88,7 @@ export const UserProvider = ({ children }) =>
 
        //    Update USER
        const update_user = (name, phone_number,is_organizer, password) =>{
-        fetch('http://localhost:5000/users', {
+        fetch(`${server_url}/users`, {
             method: 'PUT',
             body: JSON.stringify({
                 name: name,
@@ -120,7 +121,7 @@ export const UserProvider = ({ children }) =>
 
     // Logout
     const logout = () =>{
-        fetch('http://localhost:5000/logout', {
+        fetch(`${server_url}/logout`, {
             method: 'DELETE',
             headers: {
               'Content-type': 'application/json',

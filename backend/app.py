@@ -1,7 +1,7 @@
 # SQLAlchemy operations
 
 # Flask
-import random
+import random, os
 import datetime
 from flask import Flask, request, jsonify
 from flask_migrate import Migrate
@@ -10,12 +10,17 @@ from datetime import timedelta
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 bcrypt = Bcrypt()
+from dotenv import load_dotenv,dotenv_values
 
+load_dotenv()  # take environment variables from .env.
 
+postgres_pwd = os.getenv("POSTGRES_PWD")
 
+# print(postgres_pwd)
 
 app  = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///event.db" # postgres
+app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql://events_db_mwaf_user:{postgres_pwd}"
+# "sqlite:///event.db" # postgres
 CORS(app)
 app.config["SECRET_KEY"] = "jdhfvksdjkgh"+ str(random.randint(1, 1000000))
 app.config["JWT_SECRET_KEY"] = "evrfsejhfgvret"+ str(random.randint(1, 1000000))

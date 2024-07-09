@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { UserContext } from "./UserContext"
 import { toast } from 'react-toastify'
 import { useNavigate } from "react-router-dom"
-
+import { server_url } from "../../config"
 
 export const EventContext = createContext()
 
@@ -19,7 +19,7 @@ export const EventProvider = ({ children }) =>
 
     // All your functions and state variables will be available to all the children components that are wrapped in the UserProvider
     const add_event = (event_name, location, event_date, description) =>{
-        fetch('http://localhost:5000/events', {
+        fetch(`${server_url}/events`, {
             method: 'POST',
             body: JSON.stringify({
                 event_name, location, event_date, description
@@ -52,7 +52,7 @@ export const EventProvider = ({ children }) =>
 
     // Register to attend an event
     const register_for_an_event = (event_id) =>{
-        fetch('http://localhost:5000/registrations', {
+        fetch(`${server_url}/registrations`, {
             method: 'POST',
             body: JSON.stringify({
                 event_id: event_id,
@@ -87,7 +87,7 @@ export const EventProvider = ({ children }) =>
     useEffect(()=>{
         if(auth_token)
         {
-        fetch('http://localhost:5000/events', {
+        fetch(`${server_url}/events`, {
             method: 'GET',
             headers: {
               'Content-type': 'application/json',
