@@ -152,7 +152,7 @@ export const UserProvider = ({ children }) =>
 
     useEffect(()=>{
         if(auth_token){
-                fetch("http://localhost:5000/current_user", {
+                fetch(`${server_url}/current_user`, {
                     headers: {
                     'Content-type': 'application/json',
                     'Authorization': `Bearer ${auth_token}`
